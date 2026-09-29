@@ -1,0 +1,24 @@
+# SSD-DEIM Dependencies
+# Core
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+opencv-python>=4.8.0
+
+# Evaluation
+pycocotools>=2.0.6
+
+# Visualization
+matplotlib>=3.7.0
+pillow>=10.0.0
+
+# Training utilities
+tqdm>=4.65.0
+pyyaml>=6.0
+tensorboard>=2.14.0
+wandb>=0.15.0
+
+# Deployment (optional)
+# onnx>=1.14.0
+# onnxruntime>=1.15.0
+# onnxsim>=0.4.0
