@@ -1,24 +1,49 @@
+# ============================================================================
 # SSD-DEIM Dependencies
-# Core
+# ============================================================================
+
+# ---- Core Deep Learning ----
 torch>=2.0.0
 torchvision>=0.15.0
 numpy>=1.24.0
+scipy>=1.10.0
+
+# ---- Image Processing ----
 opencv-python>=4.8.0
-
-# Evaluation
-pycocotools>=2.0.6
-
-# Visualization
-matplotlib>=3.7.0
 pillow>=10.0.0
 
-# Training utilities
+# ---- COCO Evaluation ----
+pycocotools>=2.0.6
+
+# ---- Visualization ----
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ---- Training Utilities ----
 tqdm>=4.65.0
 pyyaml>=6.0
 tensorboard>=2.14.0
 wandb>=0.15.0
 
-# Deployment (optional)
+# ---- Data Processing ----
+scikit-image>=0.21.0
+albumentations>=1.3.0
+
+# ---- Optimization & Scheduling ----
+# (part of PyTorch core)
+
+# ---- Mixed Precision ----
+# (AMP is built into PyTorch >= 1.6)
+
+# ---- Model Export (optional) ----
 # onnx>=1.14.0
 # onnxruntime>=1.15.0
 # onnxsim>=0.4.0
+# tensorrt>=8.6.0
+
+# ---- Profiling (optional) ----
+# thop>=0.1.1
+# fvcore>=0.1.5
+
+# ---- Testing ----
+pytest>=7.4.0

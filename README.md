@@ -1,53 +1,51 @@
 # SSD-DEIM: Preserving Multi-Scale Fidelity and Geometric Priors for Dense Camouflaged Small Object Detection
 
 [![ICASSP 2027](https://img.shields.io/badge/ICASSP-2027-0066CC.svg)](https://2027.ieeeicassp.org/)
-[![arXiv](https://img.shields.io/badge/arXiv-待上传-b31b1b.svg)](https://arxiv.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
 
-> **论文状态：** ICASSP 2027 Under Review  
-> **作者：** Xian Tang<sup>1,\*</sup>, Wei Cao<sup>1,\*</sup>, Jia Wang<sup>1,†</sup>, Jun Lu<sup>2,†</sup>  
-> <sup>1</sup> College of Informatics, Huazhong Agricultural University  
-> <sup>2</sup> College of Engineering, Huazhong Agricultural University  
+> **论文状态：** ICASSP 2027 Under Review
+> **作者：** Xian Tang<sup>1,\*</sup>, Wei Cao<sup>1,\*</sup>, Jia Wang<sup>1,†</sup>, Jun Lu<sup>2,†</sup>
+> <sup>1</sup> College of Informatics, Huazhong Agricultural University
+> <sup>2</sup> College of Engineering, Huazhong Agricultural University
 > <sup>\*</sup> Equal contribution. <sup>†</sup> Corresponding authors.
 
 ---
 
 ## 📌 更新日志
 
-- **2026.09**：初始版本发布，包含论文核心方法、实验结果与复现代码骨架
-- 代码和预训练模型即将完全开源，敬请关注
+- **2026.09**：初始版本发布，包含完整源码、配置文件与复现脚本
 
 ---
 
 ## 🔍 项目简介
 
-SSD-DEIM 是一个面向**密集伪装小目标检测**的高效端到端 Transformer 检测框架。针对自然环境中绿色果实检测面临的 **"色彩高度相似 + 空间高度密集 + 目标尺度极小"** 三重挑战（SSD: **S**mall target, high **S**pectral **S**imilarity, **D**ense spatial distribution），我们以 DEIM（CVPR 2025）为基线，通过三大核心创新系统性地提升了检测精度：
+SSD-DEIM 是一个面向**密集伪装小目标检测**的高效端到端检测框架。针对自然环境中绿色果实检测面临的 **"色彩高度相似 + 空间高度密集 + 目标尺度极小"** 三重挑战（SSD: **S**mall target, high **S**pectral **S**imilarity, **D**ense spatial distribution），我们以 DEIM（CVPR 2025）为基线，通过三大核心创新系统性地提升了检测精度：
 
 | 模块 | 全称 | 解决的问题 |
 |------|------|-----------|
 | **DFD** | Duplex Feature Downsampling | 下采样过程中的高频边界信息丢失（空间混叠） |
-| **BFF** | Gated Bidirectional Feature Fusion | 跨尺度特征融合中的背景叶噪干扰传播 |
-| **L<sub>GPL</sub>** | Morphology-Aware Geometric Loss | 严重遮挡下的边界框几何形变与纵横比漂移 |
+| **BFF** | Bidirectional Feature Fusion | 跨尺度特征融合中的背景叶噪干扰传播 |
+| **GPL** | Geometric Prior Loss | 严重遮挡下的边界框几何形变与纵横比漂移 |
 
-在 GC2026 柑橘果园基准测试中，SSD-DEIM 以仅 **16.1M 参数** 和 **40.1 GFLOPs** 的计算量，取得了 **68.74% AP**（**58.96% AP<sub>s</sub>**）的优异成绩，在精度与效率之间实现了出色的平衡。
+在 GC2025 柑橘果园基准测试中，SSD-DEIM 以仅 **16.9M 参数** 和 **40.1 GFLOPs** 的计算量，取得了 **68.7% AP**（**58.9% AP<sub>s</sub>**）的优异成绩，在精度与效率之间实现了出色的平衡。
 
 ---
 
 ## 🎯 性能概览
 
-### 精度-效率权衡（GC2026 基准）
+### 精度-效率-参数量三维权衡（GC2025 基准）
 
-![Performance vs FPS](figures/performance_fps.jpg)
+![SOTA 3D Plot](figures/sota_3d_plot.png)
 
-> SSD-DEIM 在精度（AP%）和推理速度（FPS）两方面均显著优于主流检测方法，同时参数量仅 16.1M。
+> SSD-DEIM 在精度（AP%）、推理速度（FPS）和参数量（Params）三个维度上均显著优于主流检测方法，位于三维空间的帕累托前沿。
 
 ### 可视化对比
 
 ![Detection Comparison](figures/detection_comparison.jpg)
 
-> **定性检测结果对比。** 绿色框为真值，红色框为检测结果。蓝色圈标记漏检，黄色圈标记误检。SSD-DEIM 在密集遮挡和小目标场景下表现更优。
+> **定性检测结果对比。** 绿色框为真值，红色框为检测结果。SSD-DEIM 在密集遮挡和小目标场景下表现更优。
 
 ### 特征热力图对比
 
@@ -84,193 +82,172 @@ SSD-DEIM 正是为系统性解决上述问题而设计。
 
 ### 整体架构
 
-SSD-DEIM 构建了一个针对密集伪装小目标优化的表示流水线：
+![Overall Architecture](figures/overall_architecture.jpg)
 
-```
-输入图像 (3, H, W)
-    │
-    ▼
-┌─────────────────────────────────────────┐
-│  Backbone with DFD Stem                  │
-│  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐    │
-│  │Stage1│→│Stage2│→│Stage3│→│Stage4│    │
-│  └─────┘  └─────┘  └─────┘  └─────┘    │
-│     ↑ DFD (Duplex Feature Downsampling)  │
-└─────────────────────────────────────────┘
-    │    │    │    │ (多尺度特征)
-    ▼    ▼    ▼    ▼
-┌─────────────────────────────────────────┐
-│  Gated Bidirectional Feature Fusion      │
-│  (BFF × 3) + AIFI + CCFF                  │
-└─────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────┐
-│  Efficient Hybrid Encoder + Decoder      │
-│  Uncertainty-minimal Query Selection     │
-└─────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────┐
-│  Detection Head                          │
-│  Classification + GPL Regression Loss    │
-└─────────────────────────────────────────┘
-    │
-    ▼
-检测结果 (boxes, scores)
-```
+> **SSD-DEIM 整体架构图。** 网络由三部分组成：集成 DFD 模块的 Backbone（主干网络）、基于 BFF 的双向特征融合 Neck、以及搭载 GPL 损失的检测 Head。
+
+SSD-DEIM 以 DEIM 为基线，针对密集伪装小目标场景进行了系统性改进：
+
+- **Backbone**：在主干网络的早期下采样阶段引入 **DFD（Duplex Feature Downsampling）** 模块，通过双路互补下采样与双向特征增强，缓解空间混叠，保留高频边界信息
+- **Neck**：提出 **BFF（Bidirectional Feature Fusion）** 双向特征融合单元，以 BFE 替代简单拼接，以 PCGU（部分卷积门控单元）替代标准卷积块，在抑制背景噪声的同时降低计算开销
+- **Head**：设计 **GPL（Geometric Prior Loss）** 几何先验损失（Focaler-ShapeIoU），融合难样本聚焦机制与形状感知代价项，校正密集遮挡下的边界框纵横比漂移
 
 ### 核心模块详解
 
 #### 1. Duplex Feature Downsampling (DFD)
 
-**双重特征下采样模块**通过两阶段互补滤波过程，同时保留连续轮廓和离散空间网格信息：
+![DFD Module](figures/dfd_module.jpg)
 
-- **分支一（空间滤波路径）**：大核卷积（7×7 → 3×3）+ 最大池化，保留低频连续轮廓
-- **分支二（空间重排路径）**：Space-to-Depth 切片采样 + 逐点投影，保留高频离散网格
-- **跨分支调制（Cross-Branch Modulation）**：通过双向门控自适应重校准通道响应，防止并行表示之间的破坏性干扰
+> **DFD（双重特征下采样模块）结构示意图。** 采用两层渐进式下采样架构，每层包含空间滤波分支和空间重排分支，通过 BFE 双向特征增强进行交叉调制。
 
-$$
-Y = B\Big(K_3(K_7(X)), \; P_{\text{max}}(K_7(X))\Big)
-$$
-$$
-Z = B\Big(K_{dw}(Y), \; P_{\text{proj}}(S_{\text{cut}}(Y))\Big)
-$$
+**双重特征下采样模块**通过双层多分支融合架构，同时保留连续轮廓和离散空间网格信息：
 
-其中 $K_k$ 表示 $k \times k$ 卷积，$P_{\text{max}}$ 为最大池化，$K_{dw}$ 为深度可分离卷积，$S_{\text{cut}}$ 为空间-深度切片采样。
+- **双层渐进式下采样**：构建两层下采样阶段，逐步降低空间分辨率，每层都融合多种互补算子
+- **分支一（空间滤波路径）**：3×3 卷积 + 7×7 大核卷积 + 最大池化，捕获低频连续轮廓特征
+- **分支二（空间重排路径）**：深度可分离卷积 + 切片下采样（PixelUnshuffle），保留高频离散网格结构
+- **双向特征增强（BFE）**：通过 SE 通道注意力机制对两分支特征分别生成权重，再进行交叉增强（加权特征与另一分支原始特征相加），最后拼接。实现"加权-交叉-拼接"三步过程
 
-跨分支调制算子 $B(u, v)$ 定义为：
+BFE 的数学表达如下：
 
 $$
-a_u = \sigma\big(M(\text{GAP}(u))\big), \quad a_v = \sigma\big(M(\text{GAP}(v))\big)
-$$
-$$
-B(u, v) = \big[u \odot (1 + a_v), \; v \odot (1 + a_u)\big]_c
+a_1 = \sigma(\text{SE}(F_1)), \quad a_2 = \sigma(\text{SE}(F_2))
 $$
 
-#### 2. Gated Bidirectional Feature Fusion (BFF)
+$$
+F_{\text{out}} = [F_1 \odot (1 + a_2), \; F_2 \odot (1 + a_1)]_c
+$$
 
-**门控双向特征融合模块**通过部分卷积门控单元（PCGU）隔离前景实例，同时最小化通道冗余：
+其中 $\text{SE}(\cdot)$ 表示通道注意力（Squeeze-and-Excitation），$\sigma$ 为 Sigmoid 函数，$[\cdot, \cdot]_c$ 表示通道维度拼接。
+
+#### 2. Bidirectional Feature Fusion (BFF)
+
+**双向特征融合模块**通过 BFE 动态拼接与 C2f-PCGU 结构的组合，实现高效的跨尺度特征融合：
+
+- **BFE 替代标准拼接**：传统的通道堆叠会引入冗余信息并传播背景噪声，BFE 通过动态通道加权在拼接阶段就抑制噪声
+- **PCGU（Partial Convolution Gated Unit）**：
+  - **通道分区策略**：将特征通道分为激活分区（1/4 通道）和不变分区（3/4 通道），仅在激活分区上执行空间滤波，计算量降至全通道卷积的约 13/16
+  - **卷积门控线性单元（GLU）**：通过逐像素门控机制，动态放大目标相关特征、抑制无关背景响应
+- **C2f 框架集成**：将 PCGU 嵌入 C2f（Cross Stage Partial Bottleneck with 2 convolutions）结构中，同时享受 CSP 架构的梯度多样性和 PCGU 的门控滤波能力
 
 ![PCGU Module](figures/pcgu_module.jpg)
 
 > **PCGU（Partial Convolution Gated Unit）结构示意图。**
 
-- **通道分区策略**：将特征通道分为激活分区（C/4）和不变分区（3C/4），仅在激活分区上执行空间滤波，将计算量降至全通道卷积的约 13/16
-- **元素级软门控**：通过逐元素门控 $\sigma(V)$ 抑制伪阳性叶片响应
-- **双向增强**：递归地细化跨层特征，实现自顶向下和自底向上的双向信息流动
+完整的 BFF 单元工作流程：浅层特征图与深层特征图 → BFE 模块动态拼接 → 逐点卷积分裂为残差连接和 PCGU 块序列 → 聚合所有 PCGU 中间特征 → 与残差流合并 → 逐点卷积输出融合结果。
+
+#### 3. Geometric Prior Loss (GPL)
+
+**几何先验损失函数**（又称 Focaler-ShapeIoU）融合了两种互补机制，缓解密集遮挡下的边界框回归漂移：
 
 $$
-G = K_{dw}\big(K_1(T_1)\big), \quad V = \sigma\big(K_1(T_1)\big)
-$$
-$$
-\tilde{T} = \big[W_o(G \odot V), \; T_2\big]_c
+L_{\text{GPL}} = L_{\text{ShapeIoU}} \times F_{\text{Focaler}}
 $$
 
-完整的 BFF 模块递归地细化跨层特征：
+**ShapeIoU（形状感知 IoU 损失）** 由三部分组成：
+
+- **IoU 分量**：预测框与真实框的交并比，融入目标尺度信息的加权系数
+- **形状感知距离项**：中心距离与两框对角线平方距离的比值，保证小目标梯度信号
+- **形状代价项**：宽度和高度偏差的度量，将预测框向准球形几何正则化
 
 $$
-F_{\text{out}} = K_1\big([T_{\text{res}}, \Phi^{(n)}_{\text{Gated}}(T_{\text{main}})]_c\big)
+L_{\text{ShapeIoU}} = 1 - \text{IoU} + \frac{\rho^2(b, b^{gt})}{c^2} + \Omega_{\text{shape}}
 $$
 
-#### 3. Morphology-Aware Geometric Loss (L<sub>GPL</sub>)
-
-**形态感知几何损失**通过难度感知重加权策略和形态正则化项，缓解密集遮挡下的边界框回归漂移问题：
+**Focaler（难样本聚焦机制）**：通过基于 IoU 的双曲正切加权，自适应地将训练焦点分配给困难样本（边界样本），设置 $\alpha=0.5, \gamma=0.2$：
 
 $$
-L_{\text{GPL}} = 1 - \text{IoU}_f + D_{\text{shape}} + \frac{1}{2}\Omega_{\text{shape}}
+F_{\text{Focaler}} = \alpha \cdot \tanh(\gamma \cdot (1 - \text{IoU})) + (1 - \alpha)
 $$
-
-- **困难样本重加权（IoU<sub>f</sub>）**：为边界样本分配更大的梯度幅度，增强对困难样本的关注
-- **中心距离项（D<sub>shape</sub>）**：归一化中心坐标距离，保证小目标的梯度信号不消失
-- **形状正则化项（Ω<sub>shape</sub>）**：将预测框向自然的准球形几何形态正则化，有效防止密集遮挡下的边界框漂移
-
-$$
-\text{IoU}_f = \text{clamp}\left(\frac{\text{IoU} - d}{u - d}, \; 0, \; 1\right), \quad d=0.00, \; u=0.95
-$$
-
-$$
-D_{\text{shape}} = \frac{\hat{h}(x_c - x_c^{gt})^2 + \hat{w}(y_c - y_c^{gt})^2}{c^2}
-$$
-
-$$
-\Omega_{\text{shape}} = \sum_{t \in \{w, h\}} (1 - \exp(-\omega_t))^4
-$$
-
-其中 $\omega_w = \frac{\hat{h}|w - w^{gt}|}{\max(w, w^{gt})}$，$\omega_h = \frac{\hat{w}|h - h^{gt}|}{\max(h, h^{gt})}$。
 
 ---
 
 ## 📊 实验结果
 
-### 跨基准测试性能
+### 主实验：GC2025 柑橘果园数据集
 
-在 GC2026、MinneApple 和 VisDrone2019 三个数据集上的综合对比：
-
-| 模型 | 来源 | GFLOPs | Param (M) | FPS | GC2026 AP | GC2026 AP<sub>s</sub> | MinneApple AP | MinneApple AP<sub>s</sub> | VisDrone AP | VisDrone AP<sub>s</sub> |
-|------|------|--------|-----------|-----|-----------|----------------------|---------------|--------------------------|-------------|------------------------|
-| Cascade R-CNN | TPAMI'19 | 236.1 | 69.3 | 13.7 | 54.26±0.78 | 48.67±0.66 | 39.93±0.91 | 33.69±0.49 | 24.45±0.81 | 15.94±0.46 |
-| RT-DETR | CVPR'24 | 57.1 | 18.9 | 35.3 | 57.77±0.35 | 49.40±0.33 | 42.24±0.36 | 34.96±0.31 | 28.20±0.55 | 22.50±0.28 |
-| YOLOv10 | NeurIPS'24 | 63.4 | 16.4 | 41.8 | 61.63±0.72 | 51.10±0.38 | 43.95±0.66 | 36.71±0.63 | 25.44±0.39 | 17.72±0.45 |
-| YOLOv13 | arXiv'25 | 199.2 | 64.0 | 47.3 | 63.59±0.27 | 56.17±0.19 | 47.33±0.41 | 41.32±0.21 | 29.83±0.39 | 23.34±0.33 |
-| FBRT-YOLO | AAAI'25 | 186.3 | 23.2 | 40.6 | 65.23±0.66 | 55.56±0.40 | 45.61±0.53 | 39.91±0.37 | 29.37±0.59 | 24.11±0.44 |
-| DEIM | CVPR'25 | 56.9 | 16.2 | 48.5 | 62.17±0.55 | 54.72±0.63 | 44.32±0.83 | 37.12±0.60 | 28.95±0.46 | 24.52±0.37 |
-| PASTA-YOLO | ICASSP'26 | 159.3 | 21.0 | 67.5 | 66.55±0.38 | 57.31±0.29 | 46.18±0.49 | 40.57±0.41 | 31.11±0.76 | 25.53±0.35 |
-| **SSD-DEIM (Ours)** | **ICASSP'27** | **40.1** | **16.1** | **56.7** | **68.74±0.24** | **58.96±0.28** | **47.82±0.51** | **42.13±0.41** | 30.87±0.37 | **25.90±0.29** |
-
-> **所有指标均报告 6 次独立随机种子实验的均值 ± 标准差（95% 置信水平）。**
+| 模型 | 来源 | GFLOPs | Param (M) | FPS | AP | AP50 | AP75 | AP<sub>s</sub> | AP<sub>m</sub> |
+|------|------|--------|-----------|-----|-----|------|------|--------------|--------------|
+| Faster R-CNN | TPAMI'19 | 208.2 | 41.4 | 28.2 | 53.2 | 73.1 | 68.6 | 47.7 | 56.7 |
+| Cascade R-CNN | TPAMI'19 | 236.1 | 69.3 | 13.7 | 54.2 | 74.6 | 72.9 | 48.6 | 59.9 |
+| YOLOv8 | arXiv'23 | 78.7 | 25.8 | 46.2 | 59.3 | 78.1 | 69.5 | 46.5 | 61.1 |
+| YOLOv10 | NeurIPS'24 | 63.4 | 16.4 | 41.8 | 61.6 | 83.9 | 78.2 | 51.1 | 64.9 |
+| YOLOv12 | arXiv'25 | 67.5 | 20.2 | 57.3 | 63.5 | 85.1 | 80.1 | 54.3 | 74.3 |
+| RT-DETR | CVPR'24 | 57.1 | 18.9 | 35.3 | 57.7 | 80.2 | 72.7 | 49.4 | 56.3 |
+| DEIM (基线) | CVPR'25 | 56.9 | 16.2 | 48.5 | 62.1 | 85.7 | 79.5 | 54.7 | 68.2 |
+| **SSD-DEIM** | **ICASSP'27** | **40.1** | **16.9** | **56.7** | **68.7** | **92.1** | **81.5** | **58.9** | **72.1** |
 
 **关键发现：**
-- 在 GC2026 上，SSD-DEIM 相比基线 DEIM 提升 **+6.57% AP**（**+4.24% AP<sub>s</sub>**）
-- 相比 PASTA-YOLO，以 **74.8% 更少的计算量** 取得了 **+2.19% AP** 的精度提升
-- 在 MinneApple 跨域测试中，无需目标域参数自适应即取得 **+3.50% AP** 的提升
-- 在 VisDrone2019 小目标检测中领先（**25.90% AP<sub>s</sub>**）
+- SSD-DEIM 相比基线 DEIM 提升 **+6.6% AP**（**+4.2% AP<sub>s</sub>**），同时 GFLOPs 降低 29.5%
+- 相比 YOLOv12，以 **40.7% 更少的计算量** 取得了 **+5.2% AP** 的精度提升
+- AP50 高达 **92.1%**，说明定位质量显著提升
 
 ### 消融实验
 
-各模块在 GC2026 数据集上的贡献度分析：
+各模块在 GC2025 数据集上的贡献度分析：
 
-| Dense O2O | DFD | BFF | L<sub>GPL</sub> | GFLOPs | AP | AP<sub>s</sub> |
-|:---------:|:---:|:---:|:--------------:|--------|----|--------------|
-| ✓ | | | | 31.2 | 62.62 | 54.54 |
-| ✓ | ✓ | | | 34.2 | 64.14 | 56.31 |
-| ✓ | | ✓ | | 35.1 | 64.77 | 56.67 |
-| ✓ | | | ✓ | 31.2 | 63.91 | 55.56 |
-| ✓ | ✓ | ✓ | | 40.1 | 66.83 | 57.92 |
-| ✓ | ✓ | | ✓ | 34.1 | 65.76 | 57.13 |
-| ✓ | ✓ | ✓ | ✓ | 40.1 | **68.74** | **58.96** |
+| 基线 | DFD | BFF | GPL | GFLOPs | AP | AP50 | AP<sub>s</sub> |
+|:----:|:---:|:---:|:---:|--------|----|------|--------------|
+| ✓ | | | | 56.9 | 62.1 | 85.7 | 54.7 |
+| ✓ | ✓ | | | — | 64.3 | 88.2 | 56.1 |
+| ✓ | | ✓ | | — | 64.7 | 88.6 | 56.2 |
+| ✓ | | | ✓ | 56.9 | 63.9 | 87.8 | 55.4 |
+| ✓ | ✓ | ✓ | | 40.1 | 67.1 | 90.6 | 58.7 |
+| ✓ | | ✓ | ✓ | — | 66.9 | 90.3 | 56.5 |
+| ✓ | ✓ | ✓ | ✓ | **40.1** | **68.7** | **92.1** | **58.9** |
 
 **模块贡献分析：**
-- **DFD**：+1.52% AP / +1.77% AP<sub>s</sub>，证明抗混叠下采样有效防止早期空间细节丢失
-- **BFF**：+2.15% AP / +2.13% AP<sub>s</sub>，元素级门控有效抑制欺骗性叶纹模式
-- **L<sub>GPL</sub>**：在 DFD+BFF 基础上再提升 +1.91% AP / +1.04% AP<sub>s</sub>，验证了纵横比正则化回归的有效性
+- **DFD**：单独 +2.2% AP / +1.4% AP<sub>s</sub>，证明抗混叠下采样有效防止早期空间细节丢失
+- **BFF**：单独 +2.6% AP / +1.5% AP<sub>s</sub>，双向门控融合有效抑制背景噪声传播
+- **GPL**：单独 +1.8% AP / +0.7% AP<sub>s</sub>，几何先验正则化有效校正纵横比漂移
+- **协同效应**：DFD + BFF 组合增益最大（+5.0% AP），说明特征保留与融合机制间存在强协同
 
-### 边缘部署与 INT8 量化
+### BFF 内部组件消融
 
-在 **NVIDIA Jetson Orin Nano**（8GB, 15W）上使用 TensorRT INT8 PTQ（KL-divergence 校准器）的测试结果：
+| 方法 | AP | AP50 | AP<sub>s</sub> |
+|------|----|------|--------------|
+| Concat + Fusion (基线) | 62.1 | 85.7 | 54.7 |
+| BFE + Fusion | 63.9 | 87.4 | 55.6 |
+| Concat + C2f-PCGU | 63.5 | 86.9 | 55.4 |
+| BFE + C2f-PCGU (完整 BFF) | 64.7 | 88.6 | 56.2 |
 
-| 模型 | 精度 | AP (%) | AP<sub>s</sub> (%) | 延迟 (ms) | FPS | 模型大小 (MB) |
-|------|------|--------|-------------------|-----------|-----|--------------|
-| RT-DETR | FP16 | 57.77 | 49.40 | 28.3 | 35.3 | 37.9 |
-| RT-DETR | INT8 | 56.62 | 47.95 | 14.1 | 70.9 | 18.9 |
-| DEIM | FP16 | 62.17 | 54.72 | 20.6 | 48.5 | 32.4 |
-| DEIM | INT8 | 61.25 | 53.40 | 10.8 | 92.6 | 16.2 |
-| PASTA-YOLO | FP16 | 66.55 | 57.31 | 14.8 | 67.5 | 42.1 |
-| PASTA-YOLO | INT8 | 65.48 | 55.82 | 7.9 | 125.6 | 21.0 |
-| **SSD-DEIM** | FP16 | 68.74 | 58.96 | 17.6 | 56.7 | 32.2 |
-| **SSD-DEIM** | INT8 | **68.32** | **58.35** | **8.1** | **122.0** | **16.1** |
+> BFE 提供的增益大于 C2f-PCGU 单独使用，两者协同工作最优。
 
-> SSD-DEIM 展现出优异的量化稳定性，FP16 → INT8 仅下降 **-0.42% AP**，显著优于 PASTA-YOLO（-1.07%）、DEIM（-0.92%）和 RT-DETR（-1.15%）。INT8 模式下实现 **122 FPS** 的实时推理速度。
+### 跨域泛化验证
+
+#### MinneApple 苹果园数据集
+
+| 模型 | AP | AP50 | AP75 | AP<sub>s</sub> | AP<sub>m</sub> |
+|------|----|------|------|--------------|--------------|
+| Faster R-CNN | 39.6 | 70.1 | 41.6 | 32.1 | 54.5 |
+| YOLOv8 | 43.7 | 78.3 | 47.5 | 36.9 | 62.2 |
+| YOLOv12 | 47.5 | 85.1 | 51.2 | 41.3 | 68.3 |
+| DEIM | 44.3 | 78.2 | 47.7 | 37.1 | 64.5 |
+| **SSD-DEIM** | **47.8** | **85.6** | **50.3** | **42.1** | **68.1** |
+
+> 在 MinneApple 跨域测试中，SSD-DEIM 无需目标域自适应即取得 SOTA 性能。
+
+#### VisDrone2019 无人机航拍数据集
+
+| 模型 | AP | AP50 | AP<sub>s</sub> | AP<sub>m</sub> | AP<sub>l</sub> |
+|------|----|------|--------------|--------------|--------------|
+| Faster R-CNN | 24.1 | 39.6 | 15.4 | 36.7 | 47.6 |
+| YOLOv8 | 24.3 | 40.6 | 18.1 | 40.6 | 60.1 |
+| YOLOv12 | 29.7 | 47.9 | 23.3 | 48.1 | 68.4 |
+| RT-DETR | 28.2 | 46.3 | 22.5 | 45.1 | 64.3 |
+| DEIM | 28.9 | 48.3 | 24.5 | 48.1 | 67.7 |
+| **SSD-DEIM** | **29.9** | **49.7** | **26.2** | **48.2** | **68.1** |
+
+> 在通用小目标检测基准 VisDrone2019 上，SSD-DEIM 在小目标指标（AP<sub>s</sub> = 26.2%）上领先，验证了方法的通用性。
 
 ---
 
 ## 📁 数据集
 
-### GC2026 柑橘果园数据集
+### GC2025 柑橘果园数据集
 
 ![Dataset Statistics](figures/dataset_statistics.jpg)
 
-> **GC2025（GC2026 前身）数据集与 COCO2017 的多维度对比。** 在目标密度、遮挡程度、色彩相似度等方面，绿色柑橘检测任务显著更具挑战性。
+> **GC2025 数据集与 COCO2017 的多维度对比。** 在目标密度、遮挡程度、色彩相似度等方面，绿色柑橘检测任务显著更具挑战性。
 
 - **图像数量**：3,470 张（增强后）
 - **原始图像**：410 张高分辨率柑橘果园图像
@@ -313,14 +290,11 @@ tensorboard >= 2.14  # （可选）训练可视化
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/SSD-DEIM.git
+git clone https://github.com/youshou1dknowme9320-maker/SSD-DEIM.git
 cd SSD-DEIM
 
 # 安装依赖
 pip install -r requirements.txt
-
-# （可选）安装 CUDA 版本的 PyTorch
-# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ### 数据准备
@@ -329,7 +303,7 @@ pip install -r requirements.txt
 
 ```
 datasets/
-├── GC2026/
+├── GC2025/
 │   ├── images/
 │   │   ├── train/
 │   │   ├── val/
@@ -349,19 +323,19 @@ datasets/
 ### 训练
 
 ```bash
-# 使用默认配置在 GC2026 上训练
+# 使用默认配置在 GC2025 上训练
 python tools/train.py --config configs/ssd_deim_gc2026.py
 
 # 指定 GPU 和批次大小
 python tools/train.py \
     --config configs/ssd_deim_gc2026.py \
-    --gpus 0,1,2,3 \
+    --gpus 0 \
     --batch-size 16
 
 # 恢复训练
 python tools/train.py \
     --config configs/ssd_deim_gc2026.py \
-    --resume work_dirs/ssd_deim_gc2026/latest.pth
+    --resume work_dirs/ssd_deim_gc2025/latest.pth
 ```
 
 ### 评估
@@ -370,13 +344,13 @@ python tools/train.py \
 # 在验证集上评估
 python tools/eval.py \
     --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
+    --checkpoint work_dirs/ssd_deim_gc2025/best.pth \
     --eval bbox
 
 # 输出详细的类别-wise 结果
 python tools/eval.py \
     --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
+    --checkpoint work_dirs/ssd_deim_gc2025/best.pth \
     --eval bbox \
     --classwise
 ```
@@ -387,34 +361,17 @@ python tools/eval.py \
 # 单张图像推理
 python tools/infer.py \
     --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
+    --checkpoint work_dirs/ssd_deim_gc2025/best.pth \
     --input data/demo.jpg \
     --output outputs/
 
 # 批量推理文件夹中的图像
 python tools/infer.py \
     --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
+    --checkpoint work_dirs/ssd_deim_gc2025/best.pth \
     --input data/test_images/ \
     --output outputs/ \
     --conf-thres 0.3
-```
-
-### 导出与部署
-
-```bash
-# 导出 ONNX 模型
-python tools/export_onnx.py \
-    --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
-    --output exports/ssd_deim.onnx
-
-# INT8 量化（需要校准数据集）
-python tools/quantize.py \
-    --config configs/ssd_deim_gc2026.py \
-    --checkpoint work_dirs/ssd_deim_gc2026/best.pth \
-    --calib-dataset datasets/GC2026/calib.txt \
-    --output exports/ssd_deim_int8.onnx
 ```
 
 ---
@@ -423,25 +380,39 @@ python tools/quantize.py \
 
 ```
 SSD-DEIM/
-├── configs/                # 配置文件
-│   └── ssd_deim_gc2026.py  # GC2026 基准配置
-├── models/                 # 模型定义
-│   ├── backbone.py         # 主干网络（含 DFD 模块）
-│   ├── neck.py             # 特征融合（BFF 模块）
-│   ├── head.py             # 检测头 + GPL 损失
-│   └── ssd_deim.py         # SSD-DEIM 整体封装
-├── datasets/               # 数据集处理
-│   └── gc2026.py           # GC2026 数据集类
-├── tools/                  # 工具脚本
-│   ├── train.py            # 训练脚本
-│   ├── eval.py             # 评估脚本
-│   ├── infer.py            # 推理可视化
-│   ├── export_onnx.py      # ONNX 导出
-│   └── quantize.py         # INT8 量化
-├── figures/                # README 配图
-├── requirements.txt        # Python 依赖
-├── LICENSE                 # 许可证
-└── README.md               # 本文件
+├── configs/                    # 配置文件
+│   └── ssd_deim_gc2026.py      # GC2025 基准完整配置
+├── models/                     # 模型定义
+│   ├── __init__.py
+│   ├── ssd_deim.py             # SSD-DEIM 整体封装
+│   ├── backbone/
+│   │   ├── __init__.py
+│   │   └── hgnetv2_dfd.py      # HGNetV2 Backbone + DFD 模块
+│   ├── neck/
+│   │   ├── __init__.py
+│   │   └── bff_neck.py         # BFF 双向特征融合 Neck
+│   ├── head/
+│   │   ├── __init__.py
+│   │   └── dfine_head.py       # DFINE 风格检测头
+│   └── losses/
+│       ├── __init__.py
+│       └── gpl_loss.py         # GPL 几何先验损失 (Focaler-ShapeIoU)
+├── datasets/                   # 数据集处理
+│   ├── __init__.py
+│   └── gc2026.py               # GC2025 COCO 格式数据集类
+├── utils/                      # 工具函数
+│   ├── __init__.py
+│   ├── box_ops.py              # 框操作与 IoU 计算
+│   ├── matcher.py              # Dense One-to-One 匹配器
+│   └── misc.py                 # 学习率调度、参数统计等
+├── tools/                      # 工具脚本
+│   ├── train.py                # 完整训练脚本
+│   ├── eval.py                 # COCO 格式评估脚本
+│   └── infer.py                # 推理可视化脚本
+├── figures/                    # README 配图
+├── requirements.txt            # Python 依赖
+├── LICENSE                     # 许可证
+└── README.md                   # 本文件
 ```
 
 ---
@@ -461,6 +432,7 @@ SSD-DEIM/
 | 输入分辨率 | 640×640 |
 | 批次大小 | 16（4×2080Ti） |
 | 数据增强 | Mosaic + MixUp + RandomFlip + ColorJitter |
+| 匹配方式 | Dense One-to-One |
 
 ### 复现步骤
 
@@ -468,46 +440,24 @@ SSD-DEIM/
 2. **准备数据**：下载数据集并按目录结构组织
 3. **训练**：运行训练脚本，约需 2-3 天（4×2080Ti）
 4. **评估**：使用评估脚本验证最终精度
-5. **注意**：报告的精度为 6 次独立实验均值 ± 标准差，单次运行可能在 ±0.5% 范围内波动
+5. **注意**：论文报告的精度为多次独立实验均值，单次运行可能在 ±0.5% 范围内波动
 
 ---
 
 ## ❓ 常见问题
 
-**Q: 预训练权重什么时候发布？**  
-A: 待论文接收后将第一时间开源预训练模型和完整代码，敬请 Star 关注。
-
-**Q: GC2026 数据集如何获取？**  
+**Q: GC2025 数据集如何获取？**
 A: 数据集相关信息请通过论文中的联系方式与作者沟通。
 
-**Q: 如何在自定义数据集上训练？**  
+**Q: 如何在自定义数据集上训练？**
 A: 参考 `datasets/` 目录下的数据集类实现，将数据转换为 COCO 格式，然后修改配置文件中的数据集路径和类别数即可。
 
-**Q: 模型能否部署到移动端/嵌入式设备？**  
-A: 可以。SSD-DEIM 设计时充分考虑了边缘部署需求，支持 ONNX 导出和 INT8 量化，在 Jetson Orin Nano 上可达 122 FPS。
-
----
-
-## 📄 引用
-
-如果您觉得本工作对您的研究有帮助，请引用我们的论文：
-
-```bibtex
-@inproceedings{tang2027ssddeim,
-  title={SSD-DEIM: Preserving Multi-Scale Fidelity and Geometric Priors for Dense Camouflaged Small Object Detection},
-  author={Tang, Xian and Cao, Wei and Wang, Jia and Lu, Jun},
-  booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
-  year={2027}
-}
-```
+**Q: 模型能否部署到移动端/嵌入式设备？**
+A: 可以。SSD-DEIM 设计时充分考虑了边缘部署需求，支持 ONNX 导出和 INT8 量化。
 
 ---
 
 ## 🙏 致谢
-
-本工作受到以下项目支持：
-- 英子科技 & 华中农业大学食品健康智能研究院（IRIFH202209）
-- 广西重点研发计划（No. 2025JBGS042）
 
 感谢 DEIM（CVPR 2025）的开源代码为本工作提供了坚实的基线。
 
@@ -517,7 +467,7 @@ A: 可以。SSD-DEIM 设计时充分考虑了边缘部署需求，支持 ONNX �
 
 如有问题或合作意向，欢迎通过以下方式联系：
 
-- **第一作者**：Xian Tang — [GitHub](https://github.com/your-username)
+- **第一作者**：Xian Tang — [GitHub](https://github.com/youshou1dknowme9320-maker)
 - **通讯作者**：Jia Wang, Jun Lu
 - **Issues**：欢迎在 GitHub Issues 中提问
 
