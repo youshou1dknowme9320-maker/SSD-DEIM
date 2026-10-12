@@ -1,11 +1,11 @@
 # SSD-DEIM: Preserving Multi-Scale Fidelity and Geometric Priors for Dense Camouflaged Small Object Detection
 
-[![ICASSP 2027](https://img.shields.io/badge/ICASSP-2027-0066CC.svg)](https://2027.ieeeicassp.org/)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
 
-> **论文状态：** ICASSP 2027 Under Review
+
 > **作者：** Xian Tang<sup>1,\*</sup>, Wei Cao<sup>1,\*</sup>, Jia Wang<sup>1,†</sup>, Jun Lu<sup>2,†</sup>
 > <sup>1</sup> College of Informatics, Huazhong Agricultural University
 > <sup>2</sup> College of Engineering, Huazhong Agricultural University
