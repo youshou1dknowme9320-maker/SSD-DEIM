@@ -6,10 +6,10 @@
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
 
 
-> **作者：** Xian Tang<sup>1,\*</sup>, Wei Cao<sup>1,\*</sup>, Jia Wang<sup>1,†</sup>, Jun Lu<sup>2,†</sup>
+> **作者：** Xian Tang<sup>1,\*</sup>, Wei Cao<sup>1, Jia Wang<sup>1,†</sup>, Jun Lu<sup>2,†</sup>
 > <sup>1</sup> College of Informatics, Huazhong Agricultural University
 > <sup>2</sup> College of Engineering, Huazhong Agricultural University
-> <sup>\*</sup> Equal contribution. <sup>†</sup> Corresponding authors.
+> <sup>†</sup> Corresponding authors.
 
 ---
 
